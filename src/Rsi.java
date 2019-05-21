@@ -1,20 +1,20 @@
-import java.util.Date;
+import java.util.Calendar;
 
 public class Rsi {
 
-    private Date date;
+    private Calendar date;
     private Double rsi;
 
-    public Rsi(Date date, Double rsi) {
+    public Rsi(Calendar date, Double rsi) {
         this.date = date;
         this.rsi = rsi;
     }
 
-    public Date getDate() {
+    public Calendar getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Calendar date) {
         this.date = date;
     }
 
@@ -24,5 +24,13 @@ public class Rsi {
 
     public void setRsi(Double rsi) {
         this.rsi = rsi;
+    }
+
+    @Override
+    public String toString() {
+        return "Rsi{" +
+                "date=" + date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" + date.get(Calendar.DATE) +
+                ", rsi=" + rsi +
+                '}';
     }
 }

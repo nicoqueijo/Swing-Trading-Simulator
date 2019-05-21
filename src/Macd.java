@@ -1,24 +1,24 @@
-import java.util.Date;
+import java.util.Calendar;
 
 public class Macd {
 
-    private Date date;
+    private Calendar date;
     private Double macdSignal;
     private Double macd;
     private Double macdHist;
 
-    public Macd(Date date, Double macdSignal, Double macd, Double macdHist) {
+    public Macd(Calendar date, Double macdSignal, Double macd, Double macdHist) {
         this.date = date;
         this.macdSignal = macdSignal;
         this.macd = macd;
         this.macdHist = macdHist;
     }
 
-    public Date getDate() {
+    public Calendar getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Calendar date) {
         this.date = date;
     }
 
@@ -44,5 +44,15 @@ public class Macd {
 
     public void setMacdHist(Double macdHist) {
         this.macdHist = macdHist;
+    }
+
+    @Override
+    public String toString() {
+        return "Macd{" +
+                "date=" + date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" + date.get(Calendar.DATE) +
+                ", macdSignal=" + macdSignal +
+                ", macd=" + macd +
+                ", macdHist=" + macdHist +
+                '}';
     }
 }

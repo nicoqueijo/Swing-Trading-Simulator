@@ -1,41 +1,48 @@
-import java.util.Date;
+import java.util.Calendar;
 
-/**
- * Encapsulates the date, price, and volume of a stock.
- */
 public class Stock {
 
-    private Date date;
-    private Double price;
-    private Integer volume;
+    private Calendar date;
+    private Price price;
+    private Macd macd;
+    private Rsi rsi;
 
-    public Stock(Date date, Double price, Integer volume) {
+    public Stock(Calendar date, Price price, Macd macd, Rsi rsi) {
         this.date = date;
         this.price = price;
-        this.volume = volume;
+        this.macd = macd;
+        this.rsi = rsi;
     }
 
-    public Date getDate() {
+    public Calendar getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Calendar date) {
         this.date = date;
     }
 
-    public Double getPrice() {
+    public Price getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(Price price) {
         this.price = price;
     }
 
-    public Integer getVolume() {
-        return volume;
+    public Macd getMacd() {
+        return macd;
     }
 
-    public void setVolume(Integer volume) {
-        this.volume = volume;
+    public void setMacd(Macd macd) {
+        this.macd = macd;
+    }
+
+    public Rsi getRsi() {
+        return rsi;
+    }
+
+    public void setRsi(Rsi rsi) {
+        this.rsi = rsi;
     }
 }
