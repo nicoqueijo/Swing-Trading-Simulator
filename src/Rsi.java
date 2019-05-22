@@ -29,7 +29,6 @@ public class Rsi {
     @Override
     public String toString() {
         return "Rsi{" +
-                "date=" + date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" + date.get(Calendar.DATE) +
                 ", rsi=" + rsi +
                 '}';
     }

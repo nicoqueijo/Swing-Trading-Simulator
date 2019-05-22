@@ -39,7 +39,6 @@ public class Price {
     @Override
     public String toString() {
         return "Price{" +
-                "date=" + date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" + date.get(Calendar.DATE) +
                 ", price=" + price +
                 ", volume=" + volume +
                 '}';

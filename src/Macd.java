@@ -49,7 +49,6 @@ public class Macd {
     @Override
     public String toString() {
         return "Macd{" +
-                "date=" + date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" + date.get(Calendar.DATE) +
                 ", macdSignal=" + macdSignal +
                 ", macd=" + macd +
                 ", macdHist=" + macdHist +
