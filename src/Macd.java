@@ -49,7 +49,7 @@ public class Macd {
     @Override
     public String toString() {
         return "Macd{" +
-                ", macdSignal=" + macdSignal +
+                "macdSignal=" + macdSignal +
                 ", macd=" + macd +
                 ", macdHist=" + macdHist +
                 '}';

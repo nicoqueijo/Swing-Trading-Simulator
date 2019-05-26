@@ -29,7 +29,7 @@ public class Rsi {
     @Override
     public String toString() {
         return "Rsi{" +
-                ", rsi=" + rsi +
+                "rsi=" + rsi +
                 '}';
     }
 }

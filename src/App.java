@@ -6,23 +6,29 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 public class App {
 
-    private static final Double STARTING_BALANCE = 100000.00;
+    private static final String API_KEY = "DVR62X1BU59QHX58";
     private static final String ticker = "SPY";
 
-    private static Double balance = new Double(STARTING_BALANCE);
-    private static Double returns = 0.0;
-    private static Double averageAnnualReturn = 0.0;
+    private static final double RSI_OVERSOLD = 30.0;
+    private static final double RSI_OVERBOUGHT = 70.0;
 
-    private static GetRequest getRequestPrice = Unirest.get("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + ticker + "&outputsize=full&apikey=DVR62X1BU59QHX58");
-    private static GetRequest getRequestMacd = Unirest.get("https://www.alphavantage.co/query?function=MACD&symbol=" + ticker + "&interval=daily&series_type=close&apikey=DVR62X1BU59QHX58");
-    private static GetRequest getRequestRsi = Unirest.get("https://www.alphavantage.co/query?function=RSI&symbol=" + ticker + "&interval=daily&time_period=14&series_type=close&apikey=DVR62X1BU59QHX58");
+    private static double swingTradeTotalReturns = 0.0;
+    private static double buyAndHoldTotalReturns = 0.0;
+    private static double swingTradeAnnualReturns = 0.0;
+    private static double buyAndHoldAnnualReturns = 0.0;
+
+    private static GetRequest getRequestPrice = Unirest.get("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + ticker + "&outputsize=full&apikey=" + API_KEY);
+    private static GetRequest getRequestMacd = Unirest.get("https://www.alphavantage.co/query?function=MACD&symbol=" + ticker + "&interval=daily&series_type=close&apikey=" + API_KEY);
+    private static GetRequest getRequestRsi = Unirest.get("https://www.alphavantage.co/query?function=RSI&symbol=" + ticker + "&interval=daily&time_period=14&series_type=close&apikey=" + API_KEY);
 
     private static List<Stock> stockDataset = new ArrayList<>();
     private static List<Price> prices = new ArrayList<>();
@@ -42,10 +48,43 @@ public class App {
 
         initDataset(shortestLength);
 
-        // Now I can start traversing it and buying/selling conditionally and tracking the balance/returns.
-        for (int i = 0; i < stockDataset.size(); i++) {
+        boolean holding = true;
+        Calendar startDate = stockDataset.get(0).getDate();
+        Calendar endDate = stockDataset.get(stockDataset.size() - 1).getDate();
+        double simulationTimeframeInYears = round(ChronoUnit.DAYS.between(startDate.toInstant(), endDate.toInstant()) / 365.0);
+        double initialPrice = stockDataset.get(0).getPrice().getPrice();
+        double finalPrice = stockDataset.get(stockDataset.size() - 1).getPrice().getPrice();
+        double boughtPrice = initialPrice;
+        for (int i = 1; i < stockDataset.size(); i++) {
             Stock stock = stockDataset.get(i);
+            Calendar date = stock.getDate();
+            double price = stock.getPrice().getPrice();
+            double rsi = stock.getRsi().getRsi();
+            if (rsi <= RSI_OVERSOLD && !holding) {
+                holding = true;
+                boughtPrice = price;
+                System.out.println(date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" + date.get(Calendar.DATE) + " \nBUY: " + round(boughtPrice));
+                System.out.println();
+            } else if (rsi >= RSI_OVERBOUGHT && holding) {
+                holding = false;
+                double gains = percentageChange(boughtPrice, price);
+                swingTradeTotalReturns += gains;
+                System.out.println(date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" + date.get(Calendar.DATE) + " \nSELL: " + round(price) + " RETURN: " + round(gains) + "%");
+                System.out.println();
+            }
         }
+        buyAndHoldTotalReturns = percentageChange(initialPrice, finalPrice);
+        swingTradeAnnualReturns = swingTradeTotalReturns / simulationTimeframeInYears;
+        buyAndHoldAnnualReturns = buyAndHoldTotalReturns / simulationTimeframeInYears;
+
+        System.out.println("\n");
+        System.out.println("TIME OF SIMULATION: " + simulationTimeframeInYears + " years");
+        System.out.println("TOTAL RETURNS:");
+        System.out.println("\tBUY & HOLD: " + round(buyAndHoldTotalReturns) + "%");
+        System.out.println("\tSWING TRADE: " + round(swingTradeTotalReturns) + "%");
+        System.out.println("ANNUAL RETURNS:");
+        System.out.println("\tBUY & HOLD: " + round(buyAndHoldAnnualReturns) + "%");
+        System.out.println("\tSWING TRADE: " + round(swingTradeAnnualReturns) + "%");
     }
 
     private static void initDataset(int shortestLength) {
@@ -54,7 +93,6 @@ public class App {
                     prices.get(i),
                     macds.get(i),
                     rsis.get(i)));
-            System.out.println(stockDataset.get(i).toString());
         }
     }
 
@@ -116,10 +154,10 @@ public class App {
     }
 
     private static double percentageChange(double oldPrice, double newPrice) {
-        return round((newPrice - oldPrice) / oldPrice * 100);
+        return (newPrice - oldPrice) / oldPrice * 100;
     }
 
-    public static double round(double value) {
+    private static double round(double value) {
         BigDecimal bigDecimal = new BigDecimal(value);
         bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_UP);
         return bigDecimal.doubleValue();
