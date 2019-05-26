@@ -16,7 +16,7 @@ import java.util.List;
 public class App {
 
     private static final String API_KEY = "DVR62X1BU59QHX58";
-    private static final String ticker = "SPY";
+    private static final String ticker = "KO";
 
     private static final double RSI_OVERSOLD = 30.0;
     private static final double RSI_OVERBOUGHT = 70.0;
@@ -55,6 +55,11 @@ public class App {
         double initialPrice = stockDataset.get(0).getPrice().getPrice();
         double finalPrice = stockDataset.get(stockDataset.size() - 1).getPrice().getPrice();
         double boughtPrice = initialPrice;
+
+        System.out.println("TICKER: " + ticker);
+        System.out.println("\n");
+        System.out.println(startDate.get(Calendar.YEAR) + "/" + (startDate.get(Calendar.MONTH) + 1) + "/" + startDate.get(Calendar.DATE) + " \nBUY: " + round(boughtPrice));
+        System.out.println();
         for (int i = 1; i < stockDataset.size(); i++) {
             Stock stock = stockDataset.get(i);
             Calendar date = stock.getDate();
@@ -73,6 +78,12 @@ public class App {
                 System.out.println();
             }
         }
+        if (holding) {
+            double gains = percentageChange(boughtPrice, finalPrice);
+            swingTradeTotalReturns += gains;
+            System.out.println(endDate.get(Calendar.YEAR) + "/" + (endDate.get(Calendar.MONTH) + 1) + "/" + endDate.get(Calendar.DATE) + " \nSELL: " + round(finalPrice) + " RETURN: " + round(gains) + "%");
+            System.out.println();
+        }
         buyAndHoldTotalReturns = percentageChange(initialPrice, finalPrice);
         swingTradeAnnualReturns = swingTradeTotalReturns / simulationTimeframeInYears;
         buyAndHoldAnnualReturns = buyAndHoldTotalReturns / simulationTimeframeInYears;
@@ -80,10 +91,10 @@ public class App {
         System.out.println("\n");
         System.out.println("TIME OF SIMULATION: " + simulationTimeframeInYears + " years");
         System.out.println("TOTAL RETURNS:");
-        System.out.println("\tBUY & HOLD: " + round(buyAndHoldTotalReturns) + "%");
+        System.out.println("\tBUY & HOLD:  " + round(buyAndHoldTotalReturns) + "%");
         System.out.println("\tSWING TRADE: " + round(swingTradeTotalReturns) + "%");
         System.out.println("ANNUAL RETURNS:");
-        System.out.println("\tBUY & HOLD: " + round(buyAndHoldAnnualReturns) + "%");
+        System.out.println("\tBUY & HOLD:  " + round(buyAndHoldAnnualReturns) + "%");
         System.out.println("\tSWING TRADE: " + round(swingTradeAnnualReturns) + "%");
     }
 
