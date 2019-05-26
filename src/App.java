@@ -1,3 +1,4 @@
+import com.google.common.collect.Lists;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
@@ -13,10 +14,15 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+// TODO
+// Implement MACD simulation
+// Refactor code
+// Update README with illustrations and instructions on how to use
+
 public class App {
 
     private static final String API_KEY = "DVR62X1BU59QHX58";
-    private static final String ticker = "KO";
+    private static String ticker;
 
     private static final double RSI_OVERSOLD = 30.0;
     private static final double RSI_OVERBOUGHT = 70.0;
@@ -26,20 +32,33 @@ public class App {
     private static double swingTradeAnnualReturns = 0.0;
     private static double buyAndHoldAnnualReturns = 0.0;
 
-    private static GetRequest getRequestPrice = Unirest.get("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + ticker + "&outputsize=full&apikey=" + API_KEY);
-    private static GetRequest getRequestMacd = Unirest.get("https://www.alphavantage.co/query?function=MACD&symbol=" + ticker + "&interval=daily&series_type=close&apikey=" + API_KEY);
-    private static GetRequest getRequestRsi = Unirest.get("https://www.alphavantage.co/query?function=RSI&symbol=" + ticker + "&interval=daily&time_period=14&series_type=close&apikey=" + API_KEY);
+    private static GetRequest getRequestPrice;
+    private static GetRequest getRequestMacd;
+    private static GetRequest getRequestRsi;
 
-    private static List<Stock> stockDataset = new ArrayList<>();
-    private static List<Price> prices = new ArrayList<>();
-    private static List<Macd> macds = new ArrayList<>();
-    private static List<Rsi> rsis = new ArrayList<>();
+    private static List<Stock> stockDataset = Lists.newArrayList();
+    private static List<Price> prices = Lists.newArrayList();
+    private static List<Macd> macds = Lists.newArrayList();
+    private static List<Rsi> rsis = Lists.newArrayList();
 
-    public static void main(String[] args) throws UnirestException {
+    public static void main(String[] args) {
 
-        initPrices();
-        initMacds();
-        initRsis();
+        try {
+            if (args.length != 1) {
+                throw new Exception();
+            }
+            ticker = args[0].toUpperCase();
+            getRequestPrice = Unirest.get("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + ticker + "&outputsize=full&apikey=" + API_KEY);
+            getRequestMacd = Unirest.get("https://www.alphavantage.co/query?function=MACD&symbol=" + ticker + "&interval=daily&series_type=close&apikey=" + API_KEY);
+            getRequestRsi = Unirest.get("https://www.alphavantage.co/query?function=RSI&symbol=" + ticker + "&interval=daily&time_period=14&series_type=close&apikey=" + API_KEY);
+            initPrices();
+            initMacds();
+            initRsis();
+        } catch (Exception exception) {
+            System.out.println("An error has occurred.");
+            System.out.println("Either ticker symbol is invalid or API call limit has been reached.");
+            return;
+        }
 
         int shortestLength = minOfThree(prices.size(), macds.size(), rsis.size());
         prices = prices.subList(prices.size() - shortestLength, prices.size());
@@ -107,19 +126,18 @@ public class App {
         }
     }
 
-    private static void initRsis() throws UnirestException {
-        JSONObject priceJsonObject = getRequestPrice.asJson().getBody().getObject().getJSONObject("Time Series (Daily)");
-        List<String> priceDates = new ArrayList<>(priceJsonObject.keySet());
-        Collections.sort(priceDates);
-        for (String date : priceDates) {
-            prices.add(new Price(
+    private static void initPrices() throws UnirestException {
+        JSONObject rsiJsonObject = getRequestRsi.asJson().getBody().getObject().getJSONObject("Technical Analysis: RSI");
+        List<String> rsiDates = new ArrayList<>(rsiJsonObject.keySet());
+        Collections.sort(rsiDates);
+        for (String date : rsiDates) {
+            rsis.add(new Rsi(
                     new GregorianCalendar(
                             Integer.parseInt(date.split("-")[0]),
                             Integer.parseInt(date.split("-")[1]) - 1,
                             Integer.parseInt(date.split("-")[2])
                     ),
-                    Double.parseDouble(priceJsonObject.getJSONObject(date).getString("4. close")),
-                    Integer.parseInt(priceJsonObject.getJSONObject(date).getString("5. volume")))
+                    Double.parseDouble(rsiJsonObject.getJSONObject(date).getString("RSI")))
             );
         }
     }
@@ -142,18 +160,19 @@ public class App {
         }
     }
 
-    private static void initPrices() throws UnirestException {
-        JSONObject rsiJsonObject = getRequestRsi.asJson().getBody().getObject().getJSONObject("Technical Analysis: RSI");
-        List<String> rsiDates = new ArrayList<>(rsiJsonObject.keySet());
-        Collections.sort(rsiDates);
-        for (String date : rsiDates) {
-            rsis.add(new Rsi(
+    private static void initRsis() throws UnirestException {
+        JSONObject priceJsonObject = getRequestPrice.asJson().getBody().getObject().getJSONObject("Time Series (Daily)");
+        List<String> priceDates = new ArrayList<>(priceJsonObject.keySet());
+        Collections.sort(priceDates);
+        for (String date : priceDates) {
+            prices.add(new Price(
                     new GregorianCalendar(
                             Integer.parseInt(date.split("-")[0]),
                             Integer.parseInt(date.split("-")[1]) - 1,
                             Integer.parseInt(date.split("-")[2])
                     ),
-                    Double.parseDouble(rsiJsonObject.getJSONObject(date).getString("RSI")))
+                    Double.parseDouble(priceJsonObject.getJSONObject(date).getString("4. close")),
+                    Integer.parseInt(priceJsonObject.getJSONObject(date).getString("5. volume")))
             );
         }
     }
