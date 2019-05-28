@@ -14,11 +14,6 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-// TODO
-// Implement MACD simulation
-// Refactor code
-// Update README with illustrations and instructions on how to use
-
 public class App {
 
     private static final String API_KEY = "DVR62X1BU59QHX58";

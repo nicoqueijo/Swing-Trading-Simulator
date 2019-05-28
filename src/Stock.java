@@ -49,7 +49,8 @@ public class Stock {
     @Override
     public String toString() {
         return "Stock{" +
-                "date=" + date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" + date.get(Calendar.DATE) +
+                "date=" + date.get(Calendar.YEAR) + "/" + (date.get(Calendar.MONTH) + 1) + "/" +
+                date.get(Calendar.DATE) +
                 ", price=" + price +
                 ", macd=" + macd +
                 ", rsi=" + rsi +
