@@ -58,15 +58,14 @@ public class App {
 
         trimLists();
         initDataset();
-        printTicker();
         simulateRsiStrategy();
+        System.out.println("\n\n");
         resetReturns();
         simulateMacdStrategy();
     }
 
     private static void printTicker() {
         System.out.println("TICKER: " + ticker);
-        System.out.println();
     }
 
     private static void resetReturns() {
@@ -158,6 +157,7 @@ public class App {
         double finalPrice = stockDataset.get(stockDataset.size() - 1).getPrice().getPrice();
         double boughtPrice = initialPrice;
 
+        printTicker();
         System.out.println("STRATEGY: RSI");
         System.out.println("Swing trade based on RSI indicator. Buy when an oversold level (30)" +
                 " is reached and sell when overbought level (70) is reached.");
@@ -221,10 +221,10 @@ public class App {
         double finalPrice = stockDataset.get(stockDataset.size() - 1).getPrice().getPrice();
         double boughtPrice = initialPrice;
 
-        System.out.println("\n");
+        printTicker();
         System.out.println("STRATEGY: MACD");
         System.out.println("Swing trade based on MACD indicator. Buy when the MACD line crosses " +
-                "above the Signal line and sell when the opposite happens");
+                "above the Signal line and sell when the opposite happens.");
         System.out.println();
         System.out.println("TRADE HISTORY:");
         System.out.println();
