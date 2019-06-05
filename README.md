@@ -17,7 +17,6 @@ Buy when the MACD line crosses above the Signal line and sell when the opposite 
 
 
 Results for ticker symbol SPY:<br/>
-(Spoiler alert: buying and holding destroy these "strategies")<br/>
 https://github.com/nicoqueijo/Swing-Trading-Simulator/blob/master/output/RSI.txt<br/>
 https://github.com/nicoqueijo/Swing-Trading-Simulator/blob/master/output/MACD.txt
 
